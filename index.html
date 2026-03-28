@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>QuickAid 🚨</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --red:#E63946;--red-dark:#c1121f;--red-light:#ff6b6b;
+  --blue:#1d3557;--blue-mid:#457b9d;--blue-light:#a8dadc;
+  --green:#2d6a4f;--green-light:#52b788;
+  --orange:#f77f00;--yellow:#fcbf49;
+  --bg:#f0f4f8;--card:#ffffff;--text:#1a1a2e;--sub:#64748b;
+  --border:#e2e8f0;--shadow:0 2px 12px rgba(0,0,0,.08);
+  --radius:16px;--radius-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;max-width:430px;margin:0 auto;position:relative}
+h1,h2,h3{font-family:'Nunito',sans-serif}
+
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;min-height:100vh;padding-bottom:70px;animation:fadeIn .2s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--blue);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar h1{font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.topbar-icons{display:flex;gap:14px}
+.topbar-icons button{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:4px}
+.status-bar{background:var(--blue);color:rgba(255,255,255,.8);padding:4px 18px 10px;display:flex;gap:16px;font-size:.72rem}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green-light);display:inline-block;margin-right:4px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── BACK BUTTON ── */
+.back-btn{background:none;border:none;color:var(--blue);font-size:1.5rem;cursor:pointer;padding:14px 18px 0;display:flex;align-items:center;gap:6px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.95rem}
+
+/* ── SOS BUTTON ── */
+.sos-wrap{padding:22px 18px 10px;display:flex;justify-content:center}
+.sos-btn{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,var(--red-light),var(--red));border:6px solid white;box-shadow:0 0 0 6px rgba(230,57,70,.25),0 8px 24px rgba(230,57,70,.4);color:#fff;font-family:'Nunito',sans-serif;font-size:1.8rem;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s}
+.sos-btn:active{transform:scale(.94)}
+.sos-btn small{font-size:.62rem;font-weight:600;opacity:.85;letter-spacing:.05em}
+.sos-hint{text-align:center;font-size:.72rem;color:var(--sub);padding:6px 18px 4px}
+
+/* ── SECTION TITLES ── */
+.section-title{font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;color:var(--sub);padding:14px 18px 6px;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── GRID CARDS ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px}
+.ecard{background:var(--card);border-radius:var(--radius);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,box-shadow .15s;border:2px solid transparent}
+.ecard:active{transform:scale(.96)}
+.ecard .eico{font-size:2rem}
+.ecard .etitle{font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;text-align:center}
+.ecard .esub{font-size:.7rem;color:var(--sub);text-align:center}
+.ecard.red{border-color:#fde8e8;background:linear-gradient(135deg,#fff5f5,#fff)}
+.ecard.blue{border-color:#e8edf5;background:linear-gradient(135deg,#f0f4ff,#fff)}
+.ecard.orange{border-color:#fff3e0;background:linear-gradient(135deg,#fff8f0,#fff)}
+.ecard.green{border-color:#e8f5e9;background:linear-gradient(135deg,#f0fff4,#fff)}
+.ecard.purple{border-color:#f3e8ff;background:linear-gradient(135deg,#faf0ff,#fff)}
+.ecard.teal{border-color:#e0f7fa;background:linear-gradient(135deg,#f0fffe,#fff)}
+
+/* ── QUICK TOOLS ── */
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 18px}
+.tool-btn{background:var(--card);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:var(--shadow);cursor:pointer;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;color:var(--text);transition:transform .15s}
+.tool-btn:active{transform:scale(.95)}
+.tool-btn span:first-child{font-size:1.5rem}
+
+/* ── EMERGENCY CONTACTS ── */
+.contacts-section{padding:0 18px}
+.contact-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;box-shadow:var(--shadow)}
+.contact-avatar{width:44px;height:44px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;font-family:'Nunito',sans-serif;font-weight:800}
+.contact-info{flex:1}
+.contact-info strong{display:block;font-weight:700;font-size:.95rem}
+.contact-info span{font-size:.78rem;color:var(--sub)}
+.call-btn{background:var(--green-light);border:none;border-radius:50%;width:38px;height:38px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.add-contact-btn{background:none;border:2px dashed var(--border);border-radius:var(--radius-sm);padding:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--sub);font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:.9rem;margin-bottom:10px}
+
+/* ── BOTTOM NAV ── */
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+.nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;color:var(--sub);transition:color .15s}
+.nav-btn .nav-ico{font-size:1.3rem;transition:transform .15s}
+.nav-btn.active{color:var(--red)}
+.nav-btn.active .nav-ico{transform:scale(1.15)}
+
+/* ── PAGE HEADER ── */
+.page-header{background:var(--blue);color:#fff;padding:16px 18px 18px}
+.page-header h2{font-size:1.4rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.page-header p{font-size:.8rem;opacity:.75;margin-top:4px}
+
+/* ── CARDS GENERAL ── */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin:0 18px 12px;box-shadow:var(--shadow)}
+.card h3{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;margin-bottom:10px}
+
+/* ── CALL BUTTONS ── */
+.call-row{display:flex;flex-direction:column;gap:10px;padding:0 18px}
+.call-card{background:var(--card);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.call-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.call-card .info{flex:1}
+.call-card .info strong{display:block;font-weight:700;font-size:.95rem}
+.call-card .info span{font-size:.75rem;color:var(--sub)}
+.dial-btn{background:var(--green-light);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer}
+
+/* ── ACTION LIST ── */
+.action-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.action-list li{display:flex;align-items:flex-start;gap:12px;font-size:.88rem;line-height:1.5}
+.step-num{background:var(--blue);color:#fff;border-radius:50%;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;margin-top:1px}
+
+/* ── MEDICAL MENU ── */
+.menu-list{display:flex;flex-direction:column;gap:10px;padding:0 18px}
+.menu-item{background:var(--card);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s}
+.menu-item:active{transform:scale(.98)}
+.menu-item .mico{font-size:2rem;width:52px;text-align:center}
+.menu-item .minfo{flex:1}
+.menu-item .minfo strong{display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem}
+.menu-item .minfo span{font-size:.78rem;color:var(--sub)}
+.menu-item .marrow{color:var(--sub);font-size:1.1rem}
+
+/* ── AI DOCTOR ── */
+.symptom-chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 4px}
+.chip{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-size:.8rem;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;transition:all .15s}
+.chip:hover,.chip.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ai-input-wrap{padding:0 18px;position:relative}
+.ai-textarea{width:100%;border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px 44px 12px 14px;font-family:'Inter',sans-serif;font-size:.88rem;resize:none;height:90px;outline:none;transition:border-color .2s}
+.ai-textarea:focus{border-color:var(--blue)}
+.ai-mic{position:absolute;right:28px;top:12px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--sub)}
+.ai-char{position:absolute;right:28px;bottom:16px;font-size:.68rem;color:var(--sub)}
+.ai-submit{margin:10px 18px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;width:calc(100% - 36px);font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
+.ai-submit:disabled{opacity:.5}
+
+/* AI Response card */
+.ai-response-box{margin:0 18px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:none}
+.ai-response-box.show{display:block}
+.ai-resp-header{background:var(--blue);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.ai-resp-header .resp-ico{font-size:2rem}
+.ai-resp-header .resp-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem}
+.ai-resp-header .resp-severity{font-size:.72rem;padding:3px 10px;border-radius:12px;font-weight:700;margin-top:2px;display:inline-block}
+.sev-mild{background:#d1fae5;color:#065f46}
+.sev-moderate{background:#fef3c7;color:#92400e}
+.sev-severe{background:#fee2e2;color:#991b1b}
+.sev-emergency{background:#dc2626;color:#fff;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
+.ai-resp-body{background:#fff;padding:14px 16px}
+.ai-section{margin-bottom:14px}
+.ai-section-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-explanation{font-size:.88rem;line-height:1.65;color:var(--text)}
+.tablet-list{display:flex;flex-direction:column;gap:8px}
+.tablet-item{background:#f8fafc;border-radius:10px;padding:10px 12px;border-left:3px solid var(--blue)}
+.tablet-item .t-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;color:var(--blue)}
+.tablet-item .t-purpose{font-size:.76rem;color:var(--sub);margin-top:1px}
+.tablet-item .t-how{font-size:.78rem;color:var(--green);margin-top:3px;font-weight:600}
+.warning-list{display:flex;flex-direction:column;gap:6px}
+.warning-item{display:flex;align-items:flex-start;gap:8px;font-size:.82rem;color:#991b1b;background:#fff5f5;border-radius:8px;padding:8px 10px}
+.remedy-list{display:flex;flex-wrap:wrap;gap:6px}
+.remedy-tag{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:5px 12px;font-size:.78rem;color:var(--green);font-weight:600}
+.ai-disclaimer{font-size:.72rem;color:var(--sub);background:#f8fafc;border-radius:8px;padding:10px 12px;text-align:center;margin-top:8px;line-height:1.5}
+.ai-loading{display:none;padding:24px;text-align:center;font-size:.9rem;color:var(--sub)}
+.ai-loading.show{display:block}
+.ai-dots{display:inline-flex;gap:4px}
+.ai-dots span{width:8px;height:8px;border-radius:50%;background:var(--blue);animation:dot .8s infinite}
+.ai-dots span:nth-child(2){animation-delay:.15s}
+.ai-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:scale(0.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* ── FIRST AID ── */
+.fa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px}
+.fa-card{background:var(--card);border-radius:var(--radius);padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s}
+.fa-card:active{transform:scale(.96)}
+.fa-card .fa-ico{font-size:2.2rem}
+.fa-card strong{font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;text-align:center}
+.fa-card span{font-size:.72rem;color:var(--sub);text-align:center}
+
+/* ── HOSPITALS ── */
+.hosp-search{margin:0 18px 12px;background:var(--card);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);cursor:pointer;border:2px solid var(--blue)}
+.hosp-search span{font-family:'Nunito',sans-serif;font-weight:700;color:var(--blue)}
+.hosp-card{background:var(--card);border-radius:var(--radius);margin:0 18px 12px;box-shadow:var(--shadow);overflow:hidden}
+.hosp-card-head{background:linear-gradient(135deg,var(--blue),var(--blue-mid));color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.hosp-card-head h3{font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem}
+.hosp-card-head span{font-size:.72rem;opacity:.8}
+.hosp-card-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.hosp-row{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.hosp-row .label{color:var(--sub);width:60px;flex-shrink:0}
+.hosp-dist{background:#e8f5e9;color:var(--green);border-radius:20px;padding:3px 10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.78rem;display:inline-flex;align-items:center;gap:4px}
+.hosp-actions{display:flex;gap:8px;margin-top:4px}
+.hosp-map-btn{flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.hosp-call-btn{background:var(--green-light);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer}
+
+/* ── MEDICINE ── */
+.med-list{display:flex;flex-direction:column;gap:10px;padding:0 18px}
+.med-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.med-ico-wrap{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#e8f4fd,#c7e9fb);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.med-info{flex:1}
+.med-info strong{display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem}
+.med-info .med-time{font-size:.78rem;color:var(--blue);font-weight:600;margin-top:2px}
+.med-info .med-freq{font-size:.72rem;color:var(--sub);margin-top:1px}
+.med-delete{background:none;border:none;color:#ef4444;font-size:1.1rem;cursor:pointer;padding:4px}
+.med-add-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px;width:calc(100% - 36px);margin:0 18px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.alert-banner{background:linear-gradient(135deg,#fff7ed,#fff);border:1.5px solid #fed7aa;border-radius:var(--radius);margin:0 18px 12px;padding:14px;display:flex;gap:10px;align-items:flex-start}
+.alert-banner .ab-ico{font-size:1.5rem;flex-shrink:0}
+.alert-banner .ab-body strong{display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;color:#92400e}
+.alert-banner .ab-body span{font-size:.78rem;color:#b45309;margin-top:2px;display:block}
+
+/* ── WOMEN SAFETY ── */
+.fake-call-btn{background:linear-gradient(135deg,#1d3557,#457b9d);color:#fff;border:none;border-radius:var(--radius-sm);padding:16px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.active{display:flex;animation:fadeIn .2s}
+.modal{background:#fff;border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:430px;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal input,.modal select{width:100%;border:2px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:.9rem;margin-bottom:12px;outline:none}
+.modal input:focus,.modal select:focus{border-color:var(--blue)}
+.modal-btns{display:flex;gap:10px;margin-top:4px}
+.modal-btns button{flex:1;padding:13px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer}
+.btn-cancel{background:var(--bg);color:var(--sub)}
+.btn-save{background:var(--blue);color:#fff}
+
+/* ── SOS MODAL ── */
+.sos-modal{display:none;position:fixed;inset:0;background:var(--red);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:20px;animation:fadeIn .2s}
+.sos-modal.active{display:flex}
+.sos-sent-ico{font-size:5rem;animation:bounce .6s infinite alternate}
+@keyframes bounce{from{transform:scale(1)}to{transform:scale(1.1)}}
+.sos-modal h2{color:#fff;font-family:'Nunito',sans-serif;font-size:1.8rem;font-weight:900}
+.sos-modal p{color:rgba(255,255,255,.85);text-align:center;font-size:.9rem;padding:0 30px}
+.sos-cancel-btn{background:#fff;color:var(--red);border:none;border-radius:14px;padding:16px 40px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;margin-top:10px}
+
+/* ── FAKE CALL MODAL ── */
+.fakecall-modal{display:none;position:fixed;inset:0;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.fakecall-modal.active{display:flex;animation:fadeIn .3s}
+.fc-avatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#457b9d,#1d3557);display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:8px;box-shadow:0 0 0 8px rgba(255,255,255,.1),0 0 0 16px rgba(255,255,255,.05);animation:fcPulse 1.5s infinite}
+@keyframes fcPulse{0%,100%{box-shadow:0 0 0 8px rgba(255,255,255,.1),0 0 0 16px rgba(255,255,255,.05)}50%{box-shadow:0 0 0 12px rgba(255,255,255,.15),0 0 0 24px rgba(255,255,255,.08)}}
+.fc-name{color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1.6rem}
+.fc-status{color:rgba(255,255,255,.6);font-size:.9rem;animation:blink 1s infinite}
+.fc-actions{display:flex;gap:50px;margin-top:30px}
+.fc-btn{width:64px;height:64px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:1.6rem;cursor:pointer;transition:transform .1s}
+.fc-btn:active{transform:scale(.9)}
+.fc-decline{background:#E63946}
+.fc-accept{background:#52b788}
+
+/* ── SAFETY TIMER ── */
+.timer-display{font-family:'Nunito',sans-serif;font-size:3.5rem;font-weight:900;text-align:center;color:var(--blue);padding:20px 0 10px}
+.timer-btns-row{display:flex;gap:8px;justify-content:center;margin:10px 0}
+.timer-dur-btn{background:var(--bg);border:2px solid var(--border);border-radius:8px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:.85rem}
+.timer-dur-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.timer-actions{display:flex;gap:10px;padding:0 18px;margin-top:8px}
+.timer-actions button{flex:1;padding:13px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer}
+.btn-start{background:var(--green-light);color:#fff}
+.btn-safe{background:var(--green);color:#fff}
+.btn-stop{background:var(--bg);color:var(--sub)}
+
+/* ── BLOOD DONOR ── */
+.blood-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 18px;margin-bottom:14px}
+.blood-btn{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:12px 4px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;text-align:center;transition:all .15s}
+.blood-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
+.donor-card{background:var(--card);border-radius:var(--radius);margin:0 18px 10px;padding:14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.donor-blood{width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;flex-shrink:0}
+.donor-info strong{display:block;font-weight:700;font-size:.92rem}
+.donor-info span{font-size:.75rem;color:var(--sub)}
+
+/* ── BAG CHECKLIST ── */
+.checklist-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border-radius:10px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow);transition:.15s}
+.checklist-item input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:var(--blue)}
+.checklist-item.checked span{text-decoration:line-through;color:var(--sub)}
+.checklist-item span{font-size:.88rem;flex:1}
+.progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin:0 18px 16px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-light));border-radius:4px;transition:width .4s}
+
+/* ── PROFILE ── */
+.profile-hero{background:linear-gradient(135deg,var(--blue),var(--blue-mid));padding:30px 18px 24px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5rem;border:3px solid rgba(255,255,255,.3)}
+.profile-hero h2{color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1.2rem}
+.profile-hero p{color:rgba(255,255,255,.7);font-size:.82rem}
+.profile-badge{background:rgba(255,255,255,.15);color:#fff;border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:700}
+.profile-list{padding:0 18px}
+.profile-section-title{font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;padding:14px 0 6px}
+.profile-item{background:var(--card);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow)}
+.profile-item .pi-ico{font-size:1.3rem;width:36px;text-align:center}
+.profile-item .pi-info{flex:1}
+.profile-item .pi-info strong{display:block;font-weight:700;font-size:.92rem}
+.profile-item .pi-info span{font-size:.75rem;color:var(--sub)}
+.profile-item .pi-arrow{color:var(--sub)}
+.logout-btn{background:#fff0f0;color:var(--red);border:none;border-radius:var(--radius-sm);padding:14px;width:calc(100% - 36px);margin:8px 18px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ── EMERGENCY ID ── */
+.eid-card{background:linear-gradient(135deg,var(--blue),#1a4a7a);border-radius:var(--radius);margin:0 18px;color:#fff;padding:20px;box-shadow:var(--shadow)}
+.eid-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.eid-avatar{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+.eid-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.2rem}
+.eid-id{font-size:.72rem;opacity:.65;margin-top:2px}
+.eid-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.eid-field label{font-size:.68rem;opacity:.65;text-transform:uppercase;letter-spacing:.05em}
+.eid-field strong{display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;margin-top:2px}
+.eid-actions{display:flex;gap:10px;margin:14px 18px 0}
+.eid-btn{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.eid-edit{background:var(--blue);color:#fff}
+.eid-share{background:var(--bg);color:var(--text)}
+.eid-note{font-size:.72rem;color:var(--sub);text-align:center;padding:8px 18px;margin-top:4px}
+
+/* ── MENTAL HEALTH ── */
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 18px;margin-bottom:16px}
+.mood-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:.68rem;font-weight:600;color:var(--sub);transition:all .15s}
+.mood-btn.active{border-color:var(--blue);background:#e8edf5;color:var(--blue)}
+.mood-btn span:first-child{font-size:1.5rem}
+.breathing-btn{background:linear-gradient(135deg,var(--blue),var(--blue-mid));color:#fff;border:none;border-radius:var(--radius);padding:20px;width:calc(100% - 36px);margin:0 18px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:.2s}
+.breathing-btn span{font-size:.78rem;opacity:.8;font-weight:600}
+
+/* ── GROUNDING ── */
+.grounding-card{background:linear-gradient(135deg,#f0f4ff,#fff);border:1.5px solid #c7d2fe;border-radius:var(--radius);margin:12px 18px 0;padding:16px}
+.grounding-card h4{font-family:'Nunito',sans-serif;font-weight:800;color:#3730a3;margin-bottom:8px}
+.grounding-card p{font-size:.85rem;line-height:1.6;color:#4338ca}
+
+/* ── MISC ── */
+.alert-note{background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:12px 14px;margin:0 18px 12px;font-size:.8rem;color:#92400e;display:flex;gap:8px;align-items:flex-start}
+.alert-note-em{background:#fee2e2;border-color:#fecaca;color:#991b1b}
+.offline-badge{background:#e8f5e9;border-radius:20px;padding:4px 12px;font-size:.72rem;color:var(--green);font-weight:700;display:inline-flex;align-items:center;gap:4px;margin:0 18px 8px}
+.earthquake-alert{background:linear-gradient(135deg,#fff7ed,#fff);border:2px solid var(--orange);border-radius:var(--radius);margin:0 18px 12px;padding:14px;display:flex;gap:10px;align-items:flex-start}
+.earthquake-alert p{font-size:.85rem;font-weight:700;color:var(--orange)}
+
+/* ── CPR page (no metronome) ── */
+.cpr-steps-header{background:linear-gradient(135deg,var(--red),#c1121f);color:#fff;padding:18px;margin:0 18px;border-radius:var(--radius);margin-bottom:12px;text-align:center}
+.cpr-steps-header h3{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.1rem}
+.cpr-steps-header p{font-size:.82rem;opacity:.85;margin-top:4px}
+
+/* Notification/toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a2e;color:#fff;border-radius:10px;padding:10px 20px;font-size:.85rem;font-weight:600;z-index:500;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ────────────── TOAST ────────────── -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     HOME SCREEN
+══════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="topbar">
+    <h1>🚑 QuickAid</h1>
+    <div class="topbar-icons">
+      <button onclick="showScreen('screen-notifications')" title="Notifications">🔔</button>
+      <button onclick="showScreen('screen-profile')" title="Profile">👤</button>
+    </div>
+  </div>
+  <div class="status-bar">
+    <span><span class="status-dot"></span>GPS Ready</span>
+    <span><span class="status-dot"></span>Online</span>
+  </div>
+
+  <div class="sos-wrap">
+    <button class="sos-btn" onclick="triggerSOS()">
+      🆘
+      <div>SOS</div>
+      <small>TAP TO SEND</small>
+    </button>
+  </div>
+  <p class="sos-hint">Sends emergency message to all contacts & dials 112</p>
+
+  <div class="section-title">Emergency Types</div>
+  <div class="grid2">
+    <div class="ecard red" onclick="showScreen('screen-accident')"><div class="eico">💥</div><div class="etitle">Accident</div><div class="esub">Road &amp; collision</div></div>
+    <div class="ecard blue" onclick="showScreen('screen-medical')"><div class="eico">⚕️</div><div class="etitle">Medical</div><div class="esub">Health crisis</div></div>
+    <div class="ecard orange" onclick="showScreen('screen-fire')"><div class="eico">🔥</div><div class="etitle">Fire</div><div class="esub">Evacuation guide</div></div>
+    <div class="ecard purple" onclick="showScreen('screen-women')"><div class="eico">🛡️</div><div class="etitle">Women Safety</div><div class="esub">Fake call &amp; SOS</div></div>
+    <div class="ecard teal" onclick="showScreen('screen-earthquake')"><div class="eico">🌍</div><div class="etitle">Earthquake</div><div class="esub">Drop &amp; cover</div></div>
+    <div class="ecard green" onclick="showScreen('screen-mental')"><div class="eico">🧠</div><div class="etitle">Mental Health</div><div class="esub">Crisis support</div></div>
+  </div>
+
+  <div class="section-title">Quick Tools</div>
+  <div class="tools-grid">
+    <button class="tool-btn" onclick="showScreen('screen-eid')"><span>🪪</span><span>Emergency ID</span></button>
+    <button class="tool-btn" onclick="showScreen('screen-timer')"><span>⏱️</span><span>Safety Timer</span></button>
+    <button class="tool-btn" onclick="showScreen('screen-donor')"><span>🩸</span><span>Blood Donor</span></button>
+    <button class="tool-btn" onclick="showScreen('screen-medicine')"><span>💊</span><span>Med Reminder</span></button>
+    <button class="tool-btn" onclick="showScreen('screen-hospitals')"><span>🏥</span><span>Hospitals</span></button>
+    <button class="tool-btn" onclick="showScreen('screen-bag')"><span>✅</span><span>Bag Checklist</span></button>
+  </div>
+
+  <div class="section-title">Emergency Contacts</div>
+  <div class="contacts-section">
+    <button class="add-contact-btn" onclick="openModal('modal-contact')">＋ Add Emergency Contact</button>
+    <div id="contacts-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HOSPITALS SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-hospitals">
+  <button class="back-btn" onclick="goBack()">← 🏥 Nearby Hospitals</button>
+  <div class="alert-note">
+    <span>📍</span><span>Using your GPS location to find nearby hospitals. Distances are approximate.</span>
+  </div>
+  <div style="padding:0 18px 12px">
+    <button onclick="findHospitals()" style="background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 20px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      📍 Find Near Me
+    </button>
+  </div>
+  <div id="hospitals-list">
+    <div style="text-align:center;padding:40px 18px;color:var(--sub)">
+      <div style="font-size:3rem;margin-bottom:12px">🏥</div>
+      <p style="font-size:.9rem">Tap "Find Near Me" to locate hospitals using your GPS</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ACCIDENT SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-accident">
+  <button class="back-btn" onclick="goBack()">← 💥 Accident</button>
+  <div class="card">
+    <h3>Road &amp; collision response</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Ensure scene is safe — turn on hazard lights and move away from traffic.</li>
+      <li><span class="step-num">2</span>Check for injuries — do not move the injured person unless there is immediate danger.</li>
+      <li><span class="step-num">3</span>Call emergency services: <strong>112</strong> (India).</li>
+      <li><span class="step-num">4</span>If trained, perform CPR if the person is unresponsive and not breathing.</li>
+      <li><span class="step-num">5</span>Control any bleeding with firm pressure using a clean cloth.</li>
+      <li><span class="step-num">6</span>Keep the injured person warm and calm until help arrives.</li>
+    </ol>
+  </div>
+  <div class="section-title">Call for Help</div>
+  <div class="call-row">
+    <div class="call-card"><div class="call-ico" style="background:#fee2e2">🚑</div><div class="info"><strong>112 — Emergency</strong><span>Ambulance &amp; Police</span></div><button class="dial-btn" onclick="dialNumber('112')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#e8edf5">🚔</div><div class="info"><strong>100 — Police</strong><span>Law enforcement</span></div><button class="dial-btn" onclick="dialNumber('100')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#fee2e2">🏥</div><div class="info"><strong>108 — Ambulance</strong><span>Medical emergency</span></div><button class="dial-btn" onclick="dialNumber('108')">Call</button></div>
+  </div>
+  <div style="height:16px"></div>
+  <div style="padding:0 18px"><button onclick="showScreen('screen-cpr')" style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px;width:100%;font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+    <span>🫀 Open CPR Guide</span><span style="color:var(--sub)">›</span>
+  </button></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MEDICAL SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-medical">
+  <button class="back-btn" onclick="goBack()">← ⚕️ Medical</button>
+  <div class="menu-list">
+    <div class="menu-item" onclick="showScreen('screen-ai-doctor')"><div class="mico">🤖</div><div class="minfo"><strong>AI Doctor</strong><span>Symptom checker</span></div><div class="marrow">›</div></div>
+    <div class="menu-item" onclick="showScreen('screen-firstaid')"><div class="mico">🩹</div><div class="minfo"><strong>First Aid Guide</strong><span>CPR, choking, burns</span></div><div class="marrow">›</div></div>
+    <div class="menu-item" onclick="showScreen('screen-hospitals')"><div class="mico">🏥</div><div class="minfo"><strong>Find Hospital</strong><span>Locate nearby</span></div><div class="marrow">›</div></div>
+    <div class="menu-item" onclick="dialNumber('108')"><div class="mico">🚑</div><div class="minfo"><strong>108 — Ambulance</strong><span>Dial now</span></div><div class="marrow">📞</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     AI DOCTOR SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-ai-doctor">
+  <button class="back-btn" onclick="goBack()">← 🤖 AI Doctor</button>
+  <div class="alert-note alert-note-em">
+    <span>⚠️</span><span>For guidance only. Always call emergency services for serious conditions.</span>
+  </div>
+
+  <div class="section-title">Quick Symptoms</div>
+  <div class="symptom-chips">
+    <span class="chip" onclick="selectChip(this,'Fever')">🌡️ Fever</span>
+    <span class="chip" onclick="selectChip(this,'Chest pain')">💔 Chest pain</span>
+    <span class="chip" onclick="selectChip(this,'Headache')">🤕 Headache</span>
+    <span class="chip" onclick="selectChip(this,'Nausea')">🤢 Nausea</span>
+    <span class="chip" onclick="selectChip(this,'Cough')">🤧 Cough</span>
+    <span class="chip" onclick="selectChip(this,'Breathing difficulty')">😮‍💨 Breathing</span>
+    <span class="chip" onclick="selectChip(this,'Rash')">🔴 Rash</span>
+    <span class="chip" onclick="selectChip(this,'Back pain')">🦴 Back pain</span>
+    <span class="chip" onclick="selectChip(this,'Dizziness')">😵 Dizziness</span>
+    <span class="chip" onclick="selectChip(this,'Burn')">🔥 Burn</span>
+    <span class="chip" onclick="selectChip(this,'Bleeding')">🩸 Bleeding</span>
+    <span class="chip" onclick="selectChip(this,'Vomiting')">🤒 Vomiting</span>
+  </div>
+
+  <div class="section-title">Or describe in detail</div>
+  <div class="ai-input-wrap">
+    <textarea class="ai-textarea" id="ai-input" maxlength="500" placeholder="Describe your symptoms in detail…" oninput="updateCharCount()"></textarea>
+    <span class="ai-char" id="ai-char">0/500</span>
+  </div>
+
+  <button class="ai-submit" id="ai-submit-btn" onclick="askAIDoctor()">
+    🩺 Ask AI Doctor →
+  </button>
+
+  <!-- Loading -->
+  <div class="ai-loading" id="ai-loading">
+    <div class="ai-dots"><span></span><span></span><span></span></div>
+    <p style="margin-top:10px;font-size:.85rem">Analyzing symptoms…</p>
+  </div>
+
+  <!-- Response Card -->
+  <div class="ai-response-box" id="ai-response-box">
+    <div class="ai-resp-header">
+      <div class="resp-ico" id="resp-emoji">🩺</div>
+      <div>
+        <div class="resp-title" id="resp-condition">AI Doctor Response</div>
+        <span class="resp-severity" id="resp-severity"></span>
+      </div>
+    </div>
+    <div class="ai-resp-body">
+      <!-- Explanation -->
+      <div class="ai-section">
+        <div class="ai-section-title">📋 What It Could Be</div>
+        <div class="ai-explanation" id="resp-explanation"></div>
+      </div>
+      <!-- Tablets -->
+      <div class="ai-section" id="resp-tablets-section">
+        <div class="ai-section-title">💊 Suggested OTC Medicines</div>
+        <div class="tablet-list" id="resp-tablets"></div>
+      </div>
+      <!-- Home Remedies -->
+      <div class="ai-section" id="resp-remedies-section">
+        <div class="ai-section-title">🌿 Home Remedies</div>
+        <div class="remedy-list" id="resp-remedies"></div>
+      </div>
+      <!-- Warnings -->
+      <div class="ai-section" id="resp-warnings-section">
+        <div class="ai-section-title">🚨 Seek Emergency Care If</div>
+        <div class="warning-list" id="resp-warnings"></div>
+      </div>
+      <div class="ai-disclaimer" id="resp-disclaimer"></div>
+    </div>
+  </div>
+  <div style="height:16px"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FIRST AID SCREEN (no metronome entry)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-firstaid">
+  <button class="back-btn" onclick="goBack()">← 🩹 First Aid Guide</button>
+  <div class="offline-badge">📶 Offline — no internet needed</div>
+  <div class="fa-grid">
+    <div class="fa-card" onclick="showScreen('screen-cpr')"><div class="fa-ico">🫀</div><strong>CPR</strong><span>Step-by-step guide</span></div>
+    <div class="fa-card" onclick="showScreen('screen-choking')"><div class="fa-ico">🫁</div><strong>Choking</strong><span>Heimlich manoeuvre</span></div>
+    <div class="fa-card" onclick="showScreen('screen-burns')"><div class="fa-ico">🔥</div><strong>Burns</strong><span>First response</span></div>
+    <div class="fa-card" onclick="showScreen('screen-fracture')"><div class="fa-ico">🦴</div><strong>Fracture</strong><span>Immobilize &amp; support</span></div>
+    <div class="fa-card" onclick="showScreen('screen-bleeding')"><div class="fa-ico">🩸</div><strong>Bleeding</strong><span>Wound care</span></div>
+    <div class="fa-card" onclick="showScreen('screen-shock')"><div class="fa-ico">⚡</div><strong>Shock</strong><span>Recognize &amp; treat</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CPR SCREEN (no metronome)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-cpr">
+  <button class="back-btn" onclick="goBack()">← 🫀 CPR Guide</button>
+  <div class="cpr-steps-header" style="margin:0 18px 12px">
+    <h3>100–120 compressions/min</h3>
+    <p>Follow these steps carefully until help arrives</p>
+  </div>
+  <div class="card">
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Check scene is safe. Tap shoulders — shout "Are you okay?"</li>
+      <li><span class="step-num">2</span>Call <strong>112</strong> immediately or ask someone nearby to call.</li>
+      <li><span class="step-num">3</span>Place heel of hand on centre of chest. Interlock fingers. Keep arms straight.</li>
+      <li><span class="step-num">4</span>Push down <strong>5–6 cm</strong> at <strong>100–120 compressions/min</strong>. Count aloud to keep rhythm.</li>
+      <li><span class="step-num">5</span>Give <strong>2 rescue breaths</strong> after every 30 compressions (if trained).</li>
+      <li><span class="step-num">6</span>Continue until help arrives or the person responds.</li>
+    </ol>
+  </div>
+  <div style="padding:0 18px">
+    <div class="call-card">
+      <div class="call-ico" style="background:#fee2e2">🚑</div>
+      <div class="info"><strong>112 — Emergency</strong><span>Call Now</span></div>
+      <button class="dial-btn" onclick="dialNumber('112')">Call</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHOKING, BURNS, FRACTURE, BLEEDING, SHOCK
+══════════════════════════════════════ -->
+<div class="screen" id="screen-choking">
+  <button class="back-btn" onclick="goBack()">← 🫁 Choking</button>
+  <div class="card"><h3>Heimlich Manoeuvre</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Ask "Are you choking?" — if they can't speak, cough, or breathe, act immediately.</li>
+      <li><span class="step-num">2</span>Stand behind them, wrap your arms around their waist.</li>
+      <li><span class="step-num">3</span>Make a fist with one hand just above the navel, thumb inward.</li>
+      <li><span class="step-num">4</span>Grasp the fist with the other hand. Give quick, upward thrusts.</li>
+      <li><span class="step-num">5</span>Repeat until the object is dislodged or emergency help arrives.</li>
+    </ol>
+  </div>
+</div>
+<div class="screen" id="screen-burns">
+  <button class="back-btn" onclick="goBack()">← 🔥 Burns</button>
+  <div class="card"><h3>First Response</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Cool the burn under running cool water for 10–20 minutes.</li>
+      <li><span class="step-num">2</span>Do NOT use ice, butter, or toothpaste — they worsen burns.</li>
+      <li><span class="step-num">3</span>Remove jewelry/clothing near the burn (unless stuck to skin).</li>
+      <li><span class="step-num">4</span>Cover with a clean, non-fluffy material (cling film or clean plastic bag).</li>
+      <li><span class="step-num">5</span>Call 112 for severe/large burns, facial burns, or chemical burns.</li>
+    </ol>
+  </div>
+</div>
+<div class="screen" id="screen-fracture">
+  <button class="back-btn" onclick="goBack()">← 🦴 Fracture</button>
+  <div class="card"><h3>Immobilize &amp; Support</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Stop the person from moving the injured area.</li>
+      <li><span class="step-num">2</span>Support the limb above and below the suspected fracture.</li>
+      <li><span class="step-num">3</span>Apply a splint if available — do not straighten the limb.</li>
+      <li><span class="step-num">4</span>Apply ice packs wrapped in cloth to reduce swelling.</li>
+      <li><span class="step-num">5</span>Seek immediate medical attention or call 112.</li>
+    </ol>
+  </div>
+</div>
+<div class="screen" id="screen-bleeding">
+  <button class="back-btn" onclick="goBack()">← 🩸 Bleeding</button>
+  <div class="card"><h3>Wound Care</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Apply firm, direct pressure with a clean cloth or bandage.</li>
+      <li><span class="step-num">2</span>Keep pressure for at least 10 minutes without lifting the cloth.</li>
+      <li><span class="step-num">3</span>Elevate the injured part above heart level if possible.</li>
+      <li><span class="step-num">4</span>If bleeding soaks through, add more cloth on top — do not remove the first layer.</li>
+      <li><span class="step-num">5</span>For severe/uncontrolled bleeding, call 112 immediately.</li>
+    </ol>
+  </div>
+</div>
+<div class="screen" id="screen-shock">
+  <button class="back-btn" onclick="goBack()">← ⚡ Shock</button>
+  <div class="card"><h3>Recognize &amp; Treat</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Signs: pale/clammy skin, rapid weak pulse, confusion, rapid breathing.</li>
+      <li><span class="step-num">2</span>Lay the person flat and elevate legs about 30cm (unless head/neck injury suspected).</li>
+      <li><span class="step-num">3</span>Keep them warm with a blanket. Loosen tight clothing.</li>
+      <li><span class="step-num">4</span>Do NOT give food or water.</li>
+      <li><span class="step-num">5</span>Call 112 immediately. Monitor breathing until help arrives.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FIRE SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-fire">
+  <button class="back-btn" onclick="goBack()">← 🔥 Fire Emergency</button>
+  <div class="card"><h3>Evacuation Steps</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Activate the fire alarm if available. Shout "FIRE!" to alert others.</li>
+      <li><span class="step-num">2</span>Call <strong>101</strong> (Fire) immediately.</li>
+      <li><span class="step-num">3</span>Leave immediately — do NOT collect belongings. Close doors behind you.</li>
+      <li><span class="step-num">4</span>Feel doors before opening — if hot, find another exit.</li>
+      <li><span class="step-num">5</span>Stay low if there is smoke — crawl to exit. Smoke rises, air is cleaner near the floor.</li>
+      <li><span class="step-num">6</span>Use stairs ONLY — never use elevators.</li>
+      <li><span class="step-num">7</span>Assemble at the designated muster point. Never go back inside.</li>
+    </ol>
+  </div>
+  <div class="call-row">
+    <div class="call-card"><div class="call-ico" style="background:#fff3e0">🚒</div><div class="info"><strong>101 — Fire Brigade</strong><span>Fire emergency</span></div><button class="dial-btn" onclick="dialNumber('101')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#fee2e2">🚑</div><div class="info"><strong>112 — Emergency</strong><span>All emergencies</span></div><button class="dial-btn" onclick="dialNumber('112')">Call</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     WOMEN SAFETY
+══════════════════════════════════════ -->
+<div class="screen" id="screen-women">
+  <button class="back-btn" onclick="goBack()">← 🛡️ Women Safety</button>
+  <div class="card">
+    <h3>Immediate Actions</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Stay calm. Move toward a crowded, well-lit area immediately.</li>
+      <li><span class="step-num">2</span>Call <strong>112</strong> or Women Helpline <strong>1091</strong> if in danger.</li>
+      <li><span class="step-num">3</span>Share your live location with a trusted person.</li>
+      <li><span class="step-num">4</span>Use the fake call feature below to exit an uncomfortable situation discreetly.</li>
+    </ol>
+  </div>
+  <div style="padding:0 18px;margin-bottom:4px">
+    <button class="fake-call-btn" onclick="startFakeCall()">📞 Fake Call</button>
+    <button onclick="triggerSOS()" style="background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);padding:16px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px">🆘 SOS Alert</button>
+  </div>
+  <div class="card" style="margin-bottom:8px">
+    <h3>⏱️ Safety Timer — I'm traveling alone</h3>
+    <p style="font-size:.82rem;color:var(--sub);margin-bottom:10px">Set a timer. If you don't check in, contacts will be alerted.</p>
+    <button onclick="showScreen('screen-timer')" style="background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer">Open Safety Timer →</button>
+  </div>
+  <div class="call-row">
+    <div class="call-card"><div class="call-ico" style="background:#fee2e2">🚨</div><div class="info"><strong>112 — Emergency</strong><span></span></div><button class="dial-btn" onclick="dialNumber('112')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#fce7f3">👩</div><div class="info"><strong>1091 — Women Helpline</strong><span></span></div><button class="dial-btn" onclick="dialNumber('1091')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#e8edf5">🚔</div><div class="info"><strong>100 — Police</strong><span></span></div><button class="dial-btn" onclick="dialNumber('100')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#f0f4ff">📲</div><div class="info"><strong>181 — Helpline</strong><span></span></div><button class="dial-btn" onclick="dialNumber('181')">Call</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EARTHQUAKE
+══════════════════════════════════════ -->
+<div class="screen" id="screen-earthquake">
+  <button class="back-btn" onclick="goBack()">← 🌍 Earthquake</button>
+  <div class="earthquake-alert"><span style="font-size:1.5rem">🚨</span><p>During shaking: DROP, COVER under sturdy table, HOLD ON until shaking stops.</p></div>
+  <div class="card"><h3>During the Earthquake</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span><strong>DROP</strong> to hands and knees immediately.</li>
+      <li><span class="step-num">2</span><strong>COVER</strong> your head and neck under a sturdy table or against an interior wall.</li>
+      <li><span class="step-num">3</span><strong>HOLD ON</strong> until shaking stops. Do NOT run outside.</li>
+      <li><span class="step-num">4</span>Stay away from windows, glass, and heavy furniture.</li>
+      <li><span class="step-num">5</span>If in bed — stay in bed, cover head with pillow.</li>
+    </ol>
+  </div>
+  <div class="card"><h3>After the Earthquake</h3>
+    <ol class="action-list">
+      <li><span class="step-num">1</span>Expect aftershocks. Check for injuries — don't move badly injured people.</li>
+      <li><span class="step-num">2</span>Check for gas leaks — if you smell gas, open windows and leave immediately.</li>
+      <li><span class="step-num">3</span>Do not use elevators. Be careful of fallen objects on staircases.</li>
+      <li><span class="step-num">4</span>Turn on radio for emergency broadcast information.</li>
+    </ol>
+  </div>
+  <div class="call-row">
+    <div class="call-card"><div class="call-ico" style="background:#fee2e2">🚑</div><div class="info"><strong>112 — Emergency</strong><span></span></div><button class="dial-btn" onclick="dialNumber('112')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#fff3e0">🌍</div><div class="info"><strong>1078 — Disaster Helpline</strong><span></span></div><button class="dial-btn" onclick="dialNumber('1078')">Call</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MENTAL HEALTH
+══════════════════════════════════════ -->
+<div class="screen" id="screen-mental">
+  <button class="back-btn" onclick="goBack()">← 🧠 Mental Health</button>
+  <div class="section-title">How are you feeling?</div>
+  <div class="mood-grid">
+    <button class="mood-btn" onclick="setMood(this)"><span>😌</span>Calm</button>
+    <button class="mood-btn" onclick="setMood(this)"><span>😟</span>Anxious</button>
+    <button class="mood-btn" onclick="setMood(this)"><span>😔</span>Sad</button>
+    <button class="mood-btn" onclick="setMood(this)"><span>😤</span>Angry</button>
+    <button class="mood-btn" onclick="setMood(this)"><span>😨</span>Crisis</button>
+  </div>
+  <button class="breathing-btn" onclick="startBreathing()"><span>🫁 Breathing Exercise</span><span>Tap to start 4-7-8 technique</span></button>
+  <div class="section-title" style="margin-top:12px">Helplines &amp; Resources</div>
+  <div class="call-row">
+    <div class="call-card"><div class="call-ico" style="background:#f0fdf4">📞</div><div class="info"><strong>iCall — Psychosocial helpline</strong><span>Mon–Sat, 8am–10pm</span></div><button class="dial-btn" onclick="dialNumber('9152987821')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#eff6ff">💙</div><div class="info"><strong>Vandrevala Foundation</strong><span>24/7 crisis support</span></div><button class="dial-btn" onclick="dialNumber('1860-2662-345')">Call</button></div>
+    <div class="call-card"><div class="call-ico" style="background:#faf5ff">🏥</div><div class="info"><strong>NIMHANS Helpline</strong><span>National mental health</span></div><button class="dial-btn" onclick="dialNumber('080-46110007')">Call</button></div>
+  </div>
+  <div class="grounding-card">
+    <h4>🧘 Grounding Technique</h4>
+    <p>Name <strong>5</strong> things you can see, <strong>4</strong> you can touch, <strong>3</strong> you can hear, <strong>2</strong> you can smell, <strong>1</strong> you can taste.</p>
+  </div>
+  <div style="height:16px"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EMERGENCY ID
+══════════════════════════════════════ -->
+<div class="screen" id="screen-eid">
+  <button class="back-btn" onclick="goBack()">← 🪪 Emergency ID</button>
+  <div class="eid-card">
+    <div class="eid-head">
+      <div class="eid-avatar">🧑</div>
+      <div>
+        <div class="eid-name" id="eid-name">Your Name</div>
+        <div class="eid-id">QA-ID-000001</div>
+      </div>
+    </div>
+    <div class="eid-grid">
+      <div class="eid-field"><label>Blood Group</label><strong id="eid-blood">O+</strong></div>
+      <div class="eid-field"><label>Age</label><strong id="eid-age">—</strong></div>
+      <div class="eid-field"><label>Allergies</label><strong id="eid-allergies">None</strong></div>
+      <div class="eid-field"><label>Condition</label><strong id="eid-condition">None</strong></div>
+      <div class="eid-field"><label>Emergency Contact</label><strong id="eid-econtact">Not set</strong></div>
+      <div class="eid-field"><label>Organ Donor</label><strong id="eid-donor">—</strong></div>
+    </div>
+  </div>
+  <div class="eid-actions">
+    <button class="eid-btn eid-edit" onclick="openModal('modal-eid')">✏️ Edit</button>
+    <button class="eid-btn eid-share" onclick="showToast('Emergency ID link copied!')">🔗 Share</button>
+  </div>
+  <p class="eid-note">ℹ️ This ID is accessible from your lock screen in an emergency.</p>
+</div>
+
+<!-- ══════════════════════════════════════
+     SAFETY TIMER
+══════════════════════════════════════ -->
+<div class="screen" id="screen-timer">
+  <button class="back-btn" onclick="goBack()">← ⏱️ Safety Timer</button>
+  <div class="card" style="text-align:center">
+    <p style="font-size:.82rem;color:var(--sub);margin-bottom:4px">Alerts contacts if you don't check in</p>
+    <div class="timer-display" id="timer-display">30:00</div>
+    <div class="timer-btns-row">
+      <button class="timer-dur-btn" onclick="setDuration(15)">15m</button>
+      <button class="timer-dur-btn active" onclick="setDuration(30)">30m</button>
+      <button class="timer-dur-btn" onclick="setDuration(60)">1h</button>
+      <button class="timer-dur-btn" onclick="setDuration(120)">2h</button>
+    </div>
+  </div>
+  <div class="timer-actions">
+    <button class="btn-start" onclick="startTimer()">▶ Start Timer</button>
+    <button class="btn-safe" onclick="timerSafe()">✅ I'm Safe</button>
+    <button class="btn-stop" onclick="stopTimer()">⏹ Stop</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BLOOD DONOR
+══════════════════════════════════════ -->
+<div class="screen" id="screen-donor">
+  <button class="back-btn" onclick="goBack()">← 🩸 Blood Donor Finder</button>
+  <div style="padding:0 18px 12px">
+    <button onclick="openModal('modal-donor')" style="background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px 20px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer">＋ Register as Donor</button>
+  </div>
+  <div class="section-title">Select Blood Type Needed</div>
+  <div class="blood-grid" id="blood-grid">
+    <button class="blood-btn" onclick="selectBlood(this,'A+')">A+</button>
+    <button class="blood-btn" onclick="selectBlood(this,'A-')">A-</button>
+    <button class="blood-btn" onclick="selectBlood(this,'B+')">B+</button>
+    <button class="blood-btn" onclick="selectBlood(this,'B-')">B-</button>
+    <button class="blood-btn" onclick="selectBlood(this,'O+')">O+</button>
+    <button class="blood-btn" onclick="selectBlood(this,'O-')">O-</button>
+    <button class="blood-btn" onclick="selectBlood(this,'AB+')">AB+</button>
+    <button class="blood-btn" onclick="selectBlood(this,'AB-')">AB-</button>
+  </div>
+  <div id="donor-results"><p style="text-align:center;color:var(--sub);font-size:.85rem;padding:20px">Select a blood type to find nearby donors</p></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MEDICINE REMINDERS (replaces Alerts)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-medicine">
+  <div class="page-header">
+    <h2>💊 Medicine Reminders</h2>
+    <p>Never miss a dose</p>
+  </div>
+
+  <!-- Upcoming alert banner -->
+  <div id="med-upcoming-banner" style="display:none" class="alert-banner" style="margin:12px 18px 0">
+    <div class="ab-ico">🔔</div>
+    <div class="ab-body">
+      <strong id="med-upcoming-title">Upcoming Dose</strong>
+      <span id="med-upcoming-sub">Take your medicine on time</span>
+    </div>
+  </div>
+
+  <div style="padding:12px 18px 8px">
+    <button class="med-add-btn" onclick="openModal('modal-medicine')" style="width:100%;border-radius:var(--radius-sm);padding:13px;background:var(--blue);color:#fff;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">＋ Add Medicine</button>
+  </div>
+
+  <div class="med-list" id="med-list"></div>
+
+  <div class="alert-note" style="margin-top:8px">
+    <span>ℹ️</span><span>Reminders use your device's notification system. Make sure notifications are enabled.</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BAG CHECKLIST
+══════════════════════════════════════ -->
+<div class="screen" id="screen-bag">
+  <button class="back-btn" onclick="goBack()">← ✅ Emergency Bag</button>
+  <div class="progress-bar"><div class="progress-fill" id="bag-progress" style="width:0%"></div></div>
+  <p style="text-align:center;font-size:.8rem;color:var(--sub);margin-bottom:12px" id="bag-percent">0% of your bag is ready</p>
+  <div style="padding:0 18px" id="bag-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PROFILE
+══════════════════════════════════════ -->
+<div class="screen" id="screen-profile">
+  <div class="profile-hero">
+    <div class="profile-avatar">🧑</div>
+    <h2 id="profile-name">Your Name</h2>
+    <p id="profile-email">user@quickaid.app</p>
+    <span class="profile-badge">✅ Account Active</span>
+  </div>
+  <div class="profile-list">
+    <div class="profile-section-title">Account</div>
+    <div class="profile-item" onclick="showScreen('screen-eid')"><div class="pi-ico">🪪</div><div class="pi-info"><strong>Emergency ID</strong><span>Blood group, allergies, conditions</span></div><span class="pi-arrow">›</span></div>
+    <div class="profile-item" onclick="showScreen('screen-home')"><div class="pi-ico">📞</div><div class="pi-info"><strong>Emergency Contacts</strong><span>Manage saved contacts</span></div><span class="pi-arrow">›</span></div>
+    <div class="profile-item" onclick="showScreen('screen-medicine')"><div class="pi-ico">💊</div><div class="pi-info"><strong>Medicine Reminders</strong><span>Manage your medications</span></div><span class="pi-arrow">›</span></div>
+    <div class="profile-section-title">App</div>
+    <div class="profile-item" onclick="showToast('QuickAid v2.0 · Build 2025')"><div class="pi-ico">ℹ️</div><div class="pi-info"><strong>About QuickAid</strong><span>Version 2.0 · Build 2025</span></div><span class="pi-arrow">›</span></div>
+    <button class="logout-btn" onclick="showToast('Logged out')">🚪 Log Out</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     NOTIFICATIONS (bell icon screen)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-notifications">
+  <button class="back-btn" onclick="goBack()">← 🔔 Notifications</button>
+  <div id="notifications-list" style="padding:0 18px"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════════ -->
+<nav class="bottomnav">
+  <button class="nav-btn active" id="nav-home" onclick="navTo('screen-home','nav-home')"><span class="nav-ico">🏠</span>Home</button>
+  <button class="nav-btn" id="nav-firstaid" onclick="navTo('screen-firstaid','nav-firstaid')"><span class="nav-ico">🩹</span>First Aid</button>
+  <button class="nav-btn" id="nav-hospitals" onclick="navTo('screen-hospitals','nav-hospitals')"><span class="nav-ico">🏥</span>Hospitals</button>
+  <button class="nav-btn" id="nav-medicine" onclick="navTo('screen-medicine','nav-medicine')"><span class="nav-ico">💊</span>Medicine</button>
+  <button class="nav-btn" id="nav-profile" onclick="navTo('screen-profile','nav-profile')"><span class="nav-ico">👤</span>Profile</button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     SOS MODAL
+══════════════════════════════════════ -->
+<div class="sos-modal" id="sos-modal">
+  <div class="sos-sent-ico">🆘</div>
+  <h2>SOS SENT!</h2>
+  <p>Emergency contacts notified</p>
+  <button class="sos-cancel-btn" onclick="cancelSOS()">✓ I'm Safe — Cancel</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     FAKE CALL MODAL
+══════════════════════════════════════ -->
+<div class="fakecall-modal" id="fakecall-modal">
+  <div class="fc-avatar">👩</div>
+  <div class="fc-name" id="fc-name">Mom</div>
+  <div class="fc-status">Incoming Call…</div>
+  <div class="fc-actions">
+    <button class="fc-btn fc-decline" onclick="endFakeCall()">📵</button>
+    <button class="fc-btn fc-accept" onclick="acceptFakeCall()">📞</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+<!-- Add Contact -->
+<div class="modal-overlay" id="modal-contact">
+  <div class="modal">
+    <h3>➕ Add Emergency Contact</h3>
+    <input type="text" id="contact-name" placeholder="Name"/>
+    <input type="tel" id="contact-phone" placeholder="Phone Number"/>
+    <input type="text" id="contact-relation" placeholder="Relation (optional)"/>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('modal-contact')">Cancel</button>
+      <button class="btn-save" onclick="saveContact()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Medicine -->
+<div class="modal-overlay" id="modal-medicine">
+  <div class="modal">
+    <h3>💊 Add Medicine</h3>
+    <input type="text" id="med-name" placeholder="Medicine Name &amp; Dose"/>
+    <input type="time" id="med-time" placeholder="Time(s)"/>
+    <select id="med-freq">
+      <option>Daily</option><option>Twice a day</option>
+      <option>Three times a day</option><option>Weekly</option><option>As needed</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('modal-medicine')">Cancel</button>
+      <button class="btn-save" onclick="saveMedicine()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Register Donor -->
+<div class="modal-overlay" id="modal-donor">
+  <div class="modal">
+    <h3>🩸 Register as Donor</h3>
+    <input type="text" id="donor-name" placeholder="Your Name"/>
+    <select id="donor-blood">
+      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+      <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+    </select>
+    <input type="tel" id="donor-phone" placeholder="Phone"/>
+    <input type="text" id="donor-city" placeholder="City"/>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('modal-donor')">Cancel</button>
+      <button class="btn-save" style="background:var(--red)" onclick="registerDonor()">🩸 Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit EID -->
+<div class="modal-overlay" id="modal-eid">
+  <div class="modal">
+    <h3>✏️ Edit Emergency ID</h3>
+    <input type="text" id="eid-input-name" placeholder="Full Name"/>
+    <select id="eid-input-blood">
+      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+      <option selected>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+    </select>
+    <input type="number" id="eid-input-age" placeholder="Age"/>
+    <input type="text" id="eid-input-allergies" placeholder="Known Allergies"/>
+    <input type="text" id="eid-input-condition" placeholder="Medical Condition"/>
+    <input type="text" id="eid-input-econtact" placeholder="Emergency Contact"/>
+    <select id="eid-input-donor">
+      <option>Yes</option><option>No</option><option>Not decided</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('modal-eid')">Cancel</button>
+      <button class="btn-save" onclick="saveEID()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+// ── STATE ──
+let screenHistory = ['screen-home'];
+let contacts = JSON.parse(localStorage.getItem('qa_contacts')||'[]');
+let medicines = JSON.parse(localStorage.getItem('qa_medicines')||'[{"name":"Paracetamol 500mg","time":"08:00","freq":"Daily"},{"name":"BP Medicine","time":"07:30","freq":"Daily"}]');
+let donors = JSON.parse(localStorage.getItem('qa_donors')||'[]');
+let eidData = JSON.parse(localStorage.getItem('qa_eid')||'{}');
+let bagItems = JSON.parse(localStorage.getItem('qa_bag')||'null');
+let timerInterval = null;
+let timerSeconds = 1800;
+let timerRunning = false;
+let ringtoneSrc = null;
+let audioCtx = null;
+let ringtoneNodes = [];
+let selectedChips = [];
+let currentBlood = null;
+
+const BAG_DEFAULTS = [
+  'First Aid Kit','Water (2L)','Emergency Food','Flashlight & Batteries',
+  'Phone Charger & Power Bank','Important Documents (copies)',
+  'Cash (small denominations)','Whistle','Warm Blanket','Rain Poncho',
+  'Medicines (7-day supply)','Face Masks','Hand Sanitizer','Multi-tool/Knife','Emergency Contact List'
+];
+
+// ── SCREEN NAV ──
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(screenHistory[screenHistory.length-1]!==id) screenHistory.push(id);
+  updateNav(id);
+  window.scrollTo(0,0);
+  if(id==='screen-medicine') renderMedicines();
+  if(id==='screen-home') renderContacts();
+  if(id==='screen-bag') renderBag();
+  if(id==='screen-hospitals') {};
+  if(id==='screen-notifications') renderNotifications();
+}
+function goBack(){
+  if(screenHistory.length>1){screenHistory.pop();showScreen(screenHistory[screenHistory.length-1]);}
+}
+function navTo(screenId,navId){
+  showScreen(screenId);
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(navId).classList.add('active');
+}
+function updateNav(id){
+  const map={
+    'screen-home':'nav-home','screen-firstaid':'nav-firstaid',
+    'screen-hospitals':'nav-hospitals','screen-medicine':'nav-medicine',
+    'screen-profile':'nav-profile'
+  };
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(map[id]) document.getElementById(map[id]).classList.add('active');
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── SOS ──
+function triggerSOS(){document.getElementById('sos-modal').classList.add('active')}
+function cancelSOS(){document.getElementById('sos-modal').classList.remove('active');showToast('✅ SOS cancelled')}
+
+// ── DIAL ──
+function dialNumber(n){window.location.href='tel:'+n}
+
+// ── FAKE CALL + RINGTONE ──
+function playRingtone(){
+  try{
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    ringtoneNodes = [];
+    let t = audioCtx.currentTime;
+    // Classic dual-tone phone ring: two tones, pause pattern
+    const rings = [0, 0.8, 3, 3.8, 6, 6.8, 9, 9.8, 12, 12.8];
+    rings.forEach(offset=>{
+      [440, 480].forEach(freq=>{
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, t+offset);
+        gain.gain.linearRampToValueAtTime(0.15, t+offset+0.02);
+        gain.gain.setValueAtTime(0.15, t+offset+0.6);
+        gain.gain.linearRampToValueAtTime(0, t+offset+0.65);
+        osc.start(t+offset);
+        osc.stop(t+offset+0.7);
+        ringtoneNodes.push(osc);
+      });
+    });
+  }catch(e){console.log('Audio not available')}
+}
+function stopRingtone(){
+  ringtoneNodes.forEach(n=>{try{n.stop()}catch(e){}});
+  ringtoneNodes=[];
+  if(audioCtx){try{audioCtx.close()}catch(e){} audioCtx=null;}
+}
+function startFakeCall(){
+  // Pick a contact name
+  const names = contacts.length>0 ? contacts[0].name : 'Mom';
+  document.getElementById('fc-name').textContent = names;
+  document.getElementById('fakecall-modal').classList.add('active');
+  playRingtone();
+}
+function endFakeCall(){
+  document.getElementById('fakecall-modal').classList.remove('active');
+  stopRingtone();
+}
+function acceptFakeCall(){
+  stopRingtone();
+  // Simulate a call accepted state
+  const modal = document.getElementById('fakecall-modal');
+  modal.querySelector('.fc-status').textContent = 'Connected…';
+  modal.querySelector('.fc-actions').innerHTML = '<button class="fc-btn fc-decline" onclick="endFakeCall()">📵 End</button>';
+}
+
+// ── CONTACTS ──
+function openModal(id){document.getElementById(id).classList.add('active')}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+function saveContact(){
+  const n=document.getElementById('contact-name').value.trim();
+  const p=document.getElementById('contact-phone').value.trim();
+  const r=document.getElementById('contact-relation').value.trim();
+  if(!n||!p){showToast('Please enter name and phone');return}
+  contacts.push({name:n,phone:p,relation:r});
+  localStorage.setItem('qa_contacts',JSON.stringify(contacts));
+  closeModal('modal-contact');
+  document.getElementById('contact-name').value='';
+  document.getElementById('contact-phone').value='';
+  document.getElementById('contact-relation').value='';
+  renderContacts();showToast('Contact saved ✅');
+}
+function renderContacts(){
+  const list=document.getElementById('contacts-list');
+  if(!list)return;
+  if(contacts.length===0){list.innerHTML='<p style="text-align:center;color:var(--sub);font-size:.82rem;padding:8px 0">No contacts yet</p>';return}
+  list.innerHTML=contacts.map((c,i)=>`
+    <div class="contact-card">
+      <div class="contact-avatar">${c.name[0].toUpperCase()}</div>
+      <div class="contact-info"><strong>${c.name}</strong><span>${c.phone}${c.relation?' · '+c.relation:''}</span></div>
+      <button class="call-btn" onclick="dialNumber('${c.phone}')">📞</button>
+    </div>`).join('');
+}
+
+// ── MEDICINES ──
+function saveMedicine(){
+  const n=document.getElementById('med-name').value.trim();
+  const t=document.getElementById('med-time').value;
+  const f=document.getElementById('med-freq').value;
+  if(!n){showToast('Please enter medicine name');return}
+  medicines.push({name:n,time:t||'As needed',freq:f});
+  localStorage.setItem('qa_medicines',JSON.stringify(medicines));
+  closeModal('modal-medicine');
+  document.getElementById('med-name').value='';
+  renderMedicines();showToast('Medicine added ✅');
+  checkUpcomingMed();
+}
+function deleteMedicine(i){
+  medicines.splice(i,1);
+  localStorage.setItem('qa_medicines',JSON.stringify(medicines));
+  renderMedicines();
+}
+function renderMedicines(){
+  const list=document.getElementById('med-list');
+  if(!list)return;
+  if(medicines.length===0){list.innerHTML='<p style="text-align:center;color:var(--sub);font-size:.85rem;padding:24px">No medicines added yet</p>';return}
+  list.innerHTML=medicines.map((m,i)=>`
+    <div class="med-card">
+      <div class="med-ico-wrap">💊</div>
+      <div class="med-info">
+        <strong>${m.name}</strong>
+        <div class="med-time">${formatMedTime(m.time)}</div>
+        <div class="med-freq">${m.freq}</div>
+      </div>
+      <button class="med-delete" onclick="deleteMedicine(${i})" title="Remove">🗑️</button>
+    </div>`).join('');
+  checkUpcomingMed();
+}
+function formatMedTime(t){
+  if(!t||t==='As needed')return t||'';
+  try{
+    const [h,m]=t.split(':').map(Number);
+    const d=new Date();d.setHours(h,m,0);
+    return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  }catch(e){return t}
+}
+function checkUpcomingMed(){
+  const banner=document.getElementById('med-upcoming-banner');
+  if(!banner||medicines.length===0){if(banner)banner.style.display='none';return}
+  const now=new Date();
+  let next=null,diff=Infinity;
+  medicines.forEach(m=>{
+    if(!m.time||m.time==='As needed')return;
+    const [h,mi]=m.time.split(':').map(Number);
+    const t=new Date();t.setHours(h,mi,0,0);
+    if(t<now)t.setDate(t.getDate()+1);
+    const d=t-now;
+    if(d<diff){diff=d;next=m;}
+  });
+  if(next&&diff<3600000){
+    banner.style.display='flex';
+    document.getElementById('med-upcoming-title').textContent=next.name;
+    const mins=Math.round(diff/60000);
+    document.getElementById('med-upcoming-sub').textContent=mins<=0?'Time to take your medicine!':'Due in '+mins+' minute'+(mins===1?'':'s');
+  }else{banner.style.display='none'}
+}
+
+// ── BLOOD DONOR ──
+function selectBlood(btn,type){
+  document.querySelectorAll('.blood-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');currentBlood=type;
+  renderDonors(type);
+}
+function registerDonor(){
+  const n=document.getElementById('donor-name').value.trim();
+  const b=document.getElementById('donor-blood').value;
+  const p=document.getElementById('donor-phone').value.trim();
+  const c=document.getElementById('donor-city').value.trim();
+  if(!n||!p){showToast('Please fill required fields');return}
+  donors.push({name:n,blood:b,phone:p,city:c});
+  localStorage.setItem('qa_donors',JSON.stringify(donors));
+  closeModal('modal-donor');
+  showToast('Registered as donor ✅');
+  if(currentBlood===b)renderDonors(b);
+}
+function renderDonors(type){
+  const list=document.getElementById('donor-results');
+  const filtered=donors.filter(d=>d.blood===type);
+  if(filtered.length===0){list.innerHTML=`<p style="text-align:center;color:var(--sub);font-size:.85rem;padding:20px">No ${type} donors registered yet</p>`;return}
+  list.innerHTML=filtered.map(d=>`
+    <div class="donor-card">
+      <div class="donor-blood">${d.blood}</div>
+      <div class="donor-info"><strong>${d.name}</strong><span>${d.city||'Unknown city'}</span></div>
+      <button onclick="dialNumber('${d.phone}')" style="background:var(--green-light);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer">📞 Call</button>
+    </div>`).join('');
+}
+
+// ── EMERGENCY ID ──
+function saveEID(){
+  const d={
+    name:document.getElementById('eid-input-name').value||'Your Name',
+    blood:document.getElementById('eid-input-blood').value,
+    age:document.getElementById('eid-input-age').value||'—',
+    allergies:document.getElementById('eid-input-allergies').value||'None',
+    condition:document.getElementById('eid-input-condition').value||'None',
+    econtact:document.getElementById('eid-input-econtact').value||'Not set',
+    donor:document.getElementById('eid-input-donor').value
+  };
+  eidData=d;localStorage.setItem('qa_eid',JSON.stringify(d));
+  document.getElementById('eid-name').textContent=d.name;
+  document.getElementById('eid-blood').textContent=d.blood;
+  document.getElementById('eid-age').textContent=d.age;
+  document.getElementById('eid-allergies').textContent=d.allergies;
+  document.getElementById('eid-condition').textContent=d.condition;
+  document.getElementById('eid-econtact').textContent=d.econtact;
+  document.getElementById('eid-donor').textContent=d.donor;
+  document.getElementById('profile-name').textContent=d.name;
+  closeModal('modal-eid');showToast('Emergency ID saved ✅');
+}
+function loadEID(){
+  if(Object.keys(eidData).length===0)return;
+  document.getElementById('eid-name').textContent=eidData.name||'Your Name';
+  document.getElementById('eid-blood').textContent=eidData.blood||'O+';
+  document.getElementById('eid-age').textContent=eidData.age||'—';
+  document.getElementById('eid-allergies').textContent=eidData.allergies||'None';
+  document.getElementById('eid-condition').textContent=eidData.condition||'None';
+  document.getElementById('eid-econtact').textContent=eidData.econtact||'Not set';
+  document.getElementById('eid-donor').textContent=eidData.donor||'—';
+  if(eidData.name)document.getElementById('profile-name').textContent=eidData.name;
+}
+
+// ── TIMER ──
+function setDuration(m){
+  timerSeconds=m*60;
+  document.querySelectorAll('.timer-dur-btn').forEach(b=>{b.classList.remove('active');if(parseInt(b.textContent)===m||(m===60&&b.textContent==='1h')||(m===120&&b.textContent==='2h'))b.classList.add('active')});
+  updateTimerDisplay();
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60);const s=timerSeconds%60;
+  document.getElementById('timer-display').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+}
+function startTimer(){
+  if(timerRunning)return;timerRunning=true;
+  timerInterval=setInterval(()=>{
+    if(timerSeconds<=0){clearInterval(timerInterval);timerRunning=false;showToast('⚠️ Timer expired! Alerting contacts…');return}
+    timerSeconds--;updateTimerDisplay();
+  },1000);
+  showToast('⏱️ Safety timer started');
+}
+function timerSafe(){clearInterval(timerInterval);timerRunning=false;showToast('✅ You\'re marked safe!')}
+function stopTimer(){clearInterval(timerInterval);timerRunning=false;timerSeconds=1800;updateTimerDisplay();showToast('Timer stopped')}
+
+// ── HOSPITALS ──
+function findHospitals(){
+  const list=document.getElementById('hospitals-list');
+  list.innerHTML='<div style="text-align:center;padding:30px;color:var(--sub)"><div style="font-size:2rem;margin-bottom:8px">📍</div><p>Getting your location…</p></div>';
+  if(!navigator.geolocation){showHospitalsFallback();return}
+  navigator.geolocation.getCurrentPosition(
+    pos=>showNearbyHospitals(pos.coords.latitude,pos.coords.longitude),
+    err=>showHospitalsFallback(),
+    {timeout:8000}
+  );
+}
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function showNearbyHospitals(lat,lon){
+  // Real hospital locations (Bengaluru + generic fallback)
+  const hospitals=[
+    {name:'Manipal Hospital',sub:'Multi-specialty',lat:12.9365,lon:77.5974,phone:'080-25024444',type:'🏥'},
+    {name:'Fortis Hospital',sub:'Emergency & Trauma',lat:12.9257,lon:77.6848,phone:'080-66214444',type:'🏥'},
+    {name:'Apollo Hospital',sub:'Multi-specialty',lat:12.9120,lon:77.6032,phone:'080-26304050',type:'🏥'},
+    {name:'Victoria Hospital',sub:'Government Hospital',lat:12.9719,lon:77.5712,phone:'080-26700104',type:'🏥'},
+    {name:'Narayana Health City',sub:'Cardiac & Cancer',lat:12.8980,lon:77.6220,phone:'1800-309-2200',type:'🏥'},
+    {name:'Sakra World Hospital',sub:'Emergency 24/7',lat:12.9351,lon:77.6975,phone:'080-49694969',type:'🏥'},
+  ];
+  const withDist=hospitals.map(h=>({...h,dist:haversine(lat,lon,h.lat,h.lon)}));
+  withDist.sort((a,b)=>a.dist-b.dist);
+  const list=document.getElementById('hospitals-list');
+  list.innerHTML=withDist.map(h=>{
+    const distStr=h.dist<1?(h.dist*1000).toFixed(0)+' m':h.dist.toFixed(1)+' km';
+    const mapsUrl=`https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${h.lat},${h.lon}&travelmode=driving`;
+    return `
+    <div class="hosp-card">
+      <div class="hosp-card-head">
+        <div style="font-size:1.8rem">${h.type}</div>
+        <div>
+          <h3>${h.name}</h3>
+          <span>${h.sub}</span>
+        </div>
+        <div class="hosp-dist" style="margin-left:auto">📍 ${distStr}</div>
+      </div>
+      <div class="hosp-card-body">
+        <div class="hosp-row"><span class="label">Distance</span><strong>${distStr} away</strong></div>
+        <div class="hosp-row"><span class="label">Phone</span><strong>${h.phone}</strong></div>
+        <div class="hosp-actions">
+          <button class="hosp-map-btn" onclick="window.open('${mapsUrl}','_blank')">🗺️ Directions on Map</button>
+          <button class="hosp-call-btn" onclick="dialNumber('${h.phone.replace(/-/g,'')}')">📞 Call</button>
+        </div>
+      </div>
+    </div>`}).join('');
+}
+function showHospitalsFallback(){
+  // Default Bengaluru coordinates
+  showNearbyHospitals(12.9716,77.5946);
+  showToast('Using default location (Bengaluru)');
+}
+
+// ── BAG CHECKLIST ──
+function renderBag(){
+  if(!bagItems)bagItems=BAG_DEFAULTS.map(item=>({text:item,done:false}));
+  const checked=bagItems.filter(i=>i.done).length;
+  const pct=Math.round(checked/bagItems.length*100);
+  document.getElementById('bag-progress').style.width=pct+'%';
+  document.getElementById('bag-percent').textContent=pct+'% of your bag is ready';
+  document.getElementById('bag-list').innerHTML=bagItems.map((item,i)=>`
+    <div class="checklist-item ${item.done?'checked':''}" onclick="toggleBag(${i})">
+      <input type="checkbox" ${item.done?'checked':''} onclick="toggleBag(${i});event.stopPropagation()"/>
+      <span>${item.text}</span>
+    </div>`).join('');
+}
+function toggleBag(i){
+  bagItems[i].done=!bagItems[i].done;
+  localStorage.setItem('qa_bag',JSON.stringify(bagItems));
+  renderBag();
+}
+
+// ── AI DOCTOR ──
+function selectChip(el,symptom){
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')){
+    if(!selectedChips.includes(symptom))selectedChips.push(symptom);
+  }else{
+    selectedChips=selectedChips.filter(s=>s!==symptom);
+  }
+  const ta=document.getElementById('ai-input');
+  if(selectedChips.length>0&&!ta.value){ta.placeholder='Selected: '+selectedChips.join(', ');}
+  else if(selectedChips.length===0){ta.placeholder='Describe your symptoms in detail…';}
+}
+function updateCharCount(){
+  const v=document.getElementById('ai-input').value.length;
+  document.getElementById('ai-char').textContent=v+'/500';
+}
+async function askAIDoctor(){
+  const inputVal=document.getElementById('ai-input').value.trim();
+  const symptoms=[...selectedChips];
+  if(inputVal)symptoms.push(inputVal);
+  if(symptoms.length===0){showToast('Please enter or select symptoms');return}
+
+  const submitBtn=document.getElementById('ai-submit-btn');
+  const loading=document.getElementById('ai-loading');
+  const responseBox=document.getElementById('ai-response-box');
+
+  submitBtn.disabled=true;
+  loading.classList.add('show');
+  responseBox.classList.remove('show');
+
+  const prompt=`You are an emergency medical AI assistant for a first-aid app. The user reports these symptoms: "${symptoms.join(', ')}".
+
+Respond ONLY with a valid JSON object (no markdown, no backticks, no extra text):
+{
+  "condition": "Most likely condition name (short, 2-4 words)",
+  "emoji": "one relevant medical emoji",
+  "severity": "mild OR moderate OR severe OR emergency",
+  "explanation": "2-3 clear sentences explaining what this condition is and why these symptoms indicate it. Be concise and easy to understand.",
+  "tablets": [
+    {"name": "Medicine name + dosage", "purpose": "what it relieves", "instruction": "how and when to take"},
+    {"name": "Medicine name + dosage", "purpose": "what it relieves", "instruction": "how and when to take"}
+  ],
+  "homeRemedies": ["remedy 1", "remedy 2", "remedy 3"],
+  "warnings": ["warning sign requiring emergency care 1", "warning sign 2", "warning sign 3"],
+  "disclaimer": "Short disclaimer about consulting a doctor"
+}
+
+Use only commonly available OTC medicines (Paracetamol, Ibuprofen, ORS, Cetirizine, Antacids, etc.). For emergency severity, include fewer tablets and more warnings.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const rawText=data.content.map(c=>c.type==='text'?c.text:'').join('');
+    const clean=rawText.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    showAIResponse(parsed);
+  }catch(e){
+    // Fallback response if API fails
+    showAIResponse({
+      condition:'Unable to analyze',
+      emoji:'⚠️',
+      severity:'moderate',
+      explanation:'I was unable to fully analyze your symptoms at this time. Please consult a healthcare professional or call 112 for emergencies.',
+      tablets:[{name:'Paracetamol 500mg',purpose:'General pain & fever relief',instruction:'1 tablet every 6-8 hours with water'}],
+      homeRemedies:['Rest adequately','Stay well hydrated','Monitor symptoms'],
+      warnings:['Symptoms worsen rapidly','Difficulty breathing','Loss of consciousness'],
+      disclaimer:'Always consult a qualified doctor for proper diagnosis and treatment.'
+    });
+  }finally{
+    submitBtn.disabled=false;
+    loading.classList.remove('show');
+  }
+}
+function showAIResponse(d){
+  document.getElementById('resp-emoji').textContent=d.emoji||'🩺';
+  document.getElementById('resp-condition').textContent=d.condition||'AI Analysis';
+  const sevEl=document.getElementById('resp-severity');
+  sevEl.textContent=d.severity?.toUpperCase()||'';
+  sevEl.className='resp-severity sev-'+(d.severity||'mild');
+  document.getElementById('resp-explanation').textContent=d.explanation||'';
+  // Tablets
+  const tabList=document.getElementById('resp-tablets');
+  tabList.innerHTML=(d.tablets||[]).map(t=>`
+    <div class="tablet-item">
+      <div class="t-name">💊 ${t.name}</div>
+      <div class="t-purpose">${t.purpose}</div>
+      <div class="t-how">→ ${t.instruction}</div>
+    </div>`).join('');
+  // Remedies
+  const remDiv=document.getElementById('resp-remedies');
+  remDiv.innerHTML=(d.homeRemedies||[]).map(r=>`<span class="remedy-tag">🌿 ${r}</span>`).join('');
+  // Warnings
+  const warnList=document.getElementById('resp-warnings');
+  warnList.innerHTML=(d.warnings||[]).map(w=>`<div class="warning-item"><span>🚨</span><span>${w}</span></div>`).join('');
+  // Disclaimer
+  document.getElementById('resp-disclaimer').textContent='⚠️ '+d.disclaimer;
+  document.getElementById('ai-response-box').classList.add('show');
+  document.getElementById('ai-response-box').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── MOOD / MENTAL ──
+function setMood(btn){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const mood=btn.textContent.trim();
+  if(mood.includes('Crisis'))showToast('📞 Please call iCall: 9152987821');
+}
+function startBreathing(){showToast('🫁 Breathe in 4s… hold 7s… out 8s')}
+
+// ── NOTIFICATIONS ──
+function renderNotifications(){
+  const list=document.getElementById('notifications-list');
+  const notifs=[
+    {ico:'💊',title:'Medicine Reminder',body:medicines.length>0?`Time for ${medicines[0].name}`:'No medicines scheduled',time:'Now',color:'#e8f4fd'},
+    {ico:'⏱️',title:'Safety Check',body:'Your safety timer is active','time':'5m ago',color:'#f0fff4'},
+    {ico:'🩸',title:'Blood Drive Alert',body:'Donors needed at Victoria Hospital','time':'1h ago',color:'#fff0f0'},
+  ];
+  list.innerHTML=notifs.map(n=>`
+    <div style="background:${n.color};border-radius:var(--radius);padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start">
+      <div style="font-size:1.5rem">${n.ico}</div>
+      <div style="flex:1"><strong style="display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:.92rem">${n.title}</strong><span style="font-size:.8rem;color:var(--sub)">${n.body}</span></div>
+      <span style="font-size:.7rem;color:var(--sub);white-space:nowrap">${n.time}</span>
+    </div>`).join('');
+}
+
+// ── INIT ──
+renderContacts();
+renderMedicines();
+loadEID();
+if(!bagItems)bagItems=BAG_DEFAULTS.map(i=>({text:i,done:false}));
+updateTimerDisplay();
+
+// Check medicine reminders every minute
+setInterval(checkUpcomingMed,60000);
+checkUpcomingMed();
+</script>
+</body>
+</html>
